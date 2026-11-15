@@ -374,7 +374,7 @@ footer h4{font:600 1.05rem var(--serif);color:#fff;margin:0 0 12px}
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="mk" viewBox="20 10 200 210"><circle cx="120" cy="115" r="95" fill="#0d5f5f"/><path d="M90,90 Q120,55 165,45" fill="none" stroke="#f0d78a" stroke-width="5" stroke-linecap="round"/><path d="M90,140 Q120,175 165,185" fill="none" stroke="#f0d78a" stroke-width="5" stroke-linecap="round"/><line x1="90" y1="35" x2="90" y2="195" stroke="#a87d12" stroke-width="9" stroke-linecap="round"/><path d="M90,50 C68,75 102,90 78,115 C54,140 102,155 90,190" fill="none" stroke="#f0d78a" stroke-width="3" stroke-linecap="round"/><ellipse cx="90" cy="42" rx="7" ry="9" fill="#0d5f5f" stroke="#a87d12" stroke-width="3"/><circle cx="90" cy="50" r="6" fill="#8c1c3a"/></symbol></svg>
 
 <div class="vcount" id="vcount" role="dialog" aria-label="Counting visits" hidden>
- <p>May we count visits to improve this website? We use Google Analytics. It does not collect your name, phone or email, and you can say no. <a href="#privacy" id="vcPriv">Privacy note</a></p>
+ <p>May we count visits to improve this website? We use Google Analytics, and Google Ads to see whether our adverts lead to a message or call. Neither collects your name, phone or email, and you can say no. <a href="#privacy" id="vcPriv">Privacy note</a></p>
  <div class="vcb"><button type="button" class="btn" id="vcYes">Yes, that's fine</button><button type="button" class="btn ghost" id="vcNo">No thanks</button></div>
 </div>
 <div class="vnote" id="vnote" role="status" hidden><span></span><button type="button" id="vnoteX" aria-label="Close">&times;</button></div>
@@ -1014,7 +1014,7 @@ footer h4{font:600 1.05rem var(--serif);color:#fff;margin:0 0 12px}
   <li><b>Your profile:</b> after you sign in we also ask for your mobile number, shop or business name, type of shop, city, state, pincode and country, and (if you choose) your GST number and the date your company was established. You can view and change them any time from <b>My profile</b>, which also lists your purchases (reference, date, amount, status) and billing details, matched by your verified email address.</li>
   <li><b>Bug and change reports:</b> reports sent earlier from the website are kept in our database; only Kuttu staff can read them, and you can ask us to remove them (enquiry@kuttu.org). If you now report a problem by WhatsApp, phone or email, we use what you send only to reply and fix it.</li>
   <li><b>Deleting your account:</b> sign in, open <b>My profile</b> and choose <b>Delete my account</b> at the bottom. This removes your sign-in and the profile you saved. Records of purchases (payment reference, date and amount) are kept for our accounts and support; write to enquiry@kuttu.org to have those removed as well. A Kuttu license already installed on your PC keeps working.</li>
-  <li><b>Visit counting:</b> only if you tap Yes on the small notice, and only once a Google Analytics ID has been set up, Kuttu counts visits to this website (which pages are opened, from which country and device type, and how people found us) using Google Analytics. It does not collect your name, phone number or email for this, and no advertising is built on it. If you tap No, nothing is loaded. To change your answer, clear this site's data in your browser.</li>
+  <li><b>Visit counting:</b> only if you tap Yes on the small notice, and only once a Google Analytics ID has been set up, Kuttu counts visits to this website (which pages are opened, from which country and device type, and how people found us) using Google Analytics. If we run Google Ads, the same Yes also lets Google Ads note that a visitor from an advert tapped a WhatsApp or phone link on this page, so we can see whether the advert works; it does not collect your name, phone number or email, and it is not used to follow you around other sites. If you tap No, nothing is loaded. To change your answer, clear this site's data in your browser.</li>
   <li><b>Why:</b> to create your account, let you buy Kuttu, send your download and license key, and give you support. Nothing else.</li>
   <li><b>Who else sees it:</b> the sign-in service that stores accounts (Google Firebase), the payment provider that takes your payment, the email service that delivers your download link and, with the Online Backup edition only, the cloud storage service that holds your backup copies (Supabase). We do not see your card or UPI details, and we do not sell or rent your details to anyone.</li>
   <li><b>If you apply for a job:</b> we collect your name, email, mobile number, the role, any message you write and the resume you upload. Only our hiring team can open them. We use them only to consider you for a role, and you can ask us to delete them at any time.</li>
@@ -1208,6 +1208,9 @@ window.KUTTU_FIREBASE = {
 /* Visit counting (Google Analytics 4). Paste the web data stream's Measurement ID (G-XXXXXXXXXX) here to switch it on.
    Until then nothing is loaded and no notice is shown. Even when it is on, nothing is counted until the visitor taps "Yes". */
 window.KUTTU_ANALYTICS_ID = "G-6LQS69W4H0";
+/* Google Ads conversion (a tap on a WhatsApp or phone link). Loaded only after the visitor taps "Yes", through the same gtag.js as Analytics. */
+window.KUTTU_ADS_ID = "AW-18539763271";
+window.KUTTU_ADS_CONTACT = "AW-18539763271/SrxICJnmgrkdEMesuYhF";
 /* The offer prices end on 31 December 2026 (India time). From 1 January 2027 the page stops showing the offer: the
    "valid only till" lines disappear and each price says "Message us for the current price". Edit the date here if it changes. */
 (function () {
@@ -2056,6 +2059,7 @@ var FIREBASE_CONFIG = window.KUTTU_FIREBASE || {
     window.dataLayer = window.dataLayer || [];
     window.gtag = function () { window.dataLayer.push(arguments); };
     window.gtag('js', new Date()); window.gtag('config', id, { anonymize_ip: true });
+    if (/^AW-[0-9]{6,}$/.test(window.KUTTU_ADS_ID || '')) window.gtag('config', window.KUTTU_ADS_ID, { allow_ad_personalization_signals: false });
     var s = document.createElement('script'); s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(id);
     document.head.appendChild(s);
   }
@@ -2064,6 +2068,12 @@ var FIREBASE_CONFIG = window.KUTTU_FIREBASE || {
   document.getElementById('vcYes').onclick = function () { put('yes'); box.hidden = true; start(); };
   document.getElementById('vcNo').onclick = function () { put('no'); box.hidden = true; };
   document.getElementById('vcPriv').onclick = function () { box.hidden = true; };
+  /* Google Ads: count one conversion when a visitor who said Yes taps a WhatsApp or phone link. Does nothing if they said No. */
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="https://wa.me/"], a[href^="tel:"]');
+    if (!a || !window.__kuttuGa || !window.KUTTU_ADS_CONTACT) return;
+    window.gtag('event', 'conversion', { send_to: window.KUTTU_ADS_CONTACT });
+  });
 })();
 </script>
 <script>
