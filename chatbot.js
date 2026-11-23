@@ -99,7 +99,7 @@
   }
 
   var css = '.kbot-btn{position:fixed;right:16px;bottom:18px;z-index:70;display:flex;align-items:center;gap:8px;border:0;border-radius:999px;background:#0d5f5f;color:#fff;font:700 .95rem/1 system-ui,-apple-system,"Segoe UI",sans-serif;padding:13px 18px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25)}' +
-    '.kbot-btn:focus-visible,.kbot-x:focus-visible,.kbot-chip:focus-visible,.kbot-send:focus-visible,.kbot-in:focus-visible,.kbot-act:focus-visible{outline:3px solid #f0d78a;outline-offset:2px}' +
+    '.kbot-btn:focus-visible,.kbot-x:focus-visible,.kbot-chip:focus-visible,.kbot-send:focus-visible,.kbot-in:focus-visible,.kbot-act:focus-visible,.kbot-more:focus-visible{outline:3px solid #f0d78a;outline-offset:2px}' +
     '.kbot{position:fixed;right:16px;bottom:18px;z-index:71;width:min(360px,calc(100vw - 32px));height:min(520px,calc(100vh - 36px));display:none;flex-direction:column;background:#fbf8f2;color:#1c2626;border:1px solid #e4ddd0;border-radius:16px;box-shadow:0 10px 34px rgba(0,0,0,.3);overflow:hidden;font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}' +
     '.kbot.on{display:flex}' +
     '.kbot-h{display:flex;align-items:center;justify-content:space-between;background:#083f3f;color:#fff;padding:12px 14px;font-weight:700}' +
@@ -110,7 +110,8 @@
     '.kbot-m.me{align-self:flex-end;background:#0d5f5f;color:#fff}' +
     '.kbot-acts,.kbot-chips{display:flex;gap:6px;flex-wrap:wrap}' +
     '.kbot-act{display:inline-block;background:#0d5f5f;color:#fff;text-decoration:none;font-weight:700;font-size:.85rem;padding:7px 12px;border-radius:999px}' +
-    '.kbot-chips{padding:0 12px 8px}' +
+    '.kbot-chips{padding:0 12px 8px;max-height:132px;overflow-y:auto}.kbot-chips.off{display:none}' +
+    '.kbot-more{width:100%;border:0;border-top:1px solid #e4ddd0;background:#fbf8f2;color:#0d5f5f;font:700 .85rem system-ui,-apple-system,"Segoe UI",sans-serif;padding:8px 14px;text-align:left;cursor:pointer}' +
     '.kbot-chip{border:2px solid #0d5f5f;background:#fff;color:#0d5f5f;font:700 .82rem system-ui,sans-serif;padding:5px 11px;border-radius:999px;cursor:pointer}' +
     '.kbot-f{display:flex;gap:8px;padding:10px 12px;border-top:1px solid #e4ddd0;background:#fff}' +
     '.kbot-in{flex:1;min-width:0;border:2px solid #0d5f5f;border-radius:999px;padding:9px 14px;font:inherit;background:#fff;color:#1c2626}' +
@@ -125,11 +126,11 @@
   var box = document.createElement('div');
   box.id = 'kbot'; box.className = 'kbot'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'Kuttu helper chat');
   box.innerHTML = '<div class="kbot-h"><span>Kuttu helper</span><button type="button" class="kbot-x" aria-label="Close chat">&times;</button></div>' +
-    '<div class="kbot-log" role="log" aria-live="polite"></div><div class="kbot-chips"></div>' +
+    '<div class="kbot-log" role="log" aria-live="polite"></div><button type="button" class="kbot-more" aria-expanded="true">Questions &#9662;</button><div class="kbot-chips"></div>' +
     '<form class="kbot-f"><input class="kbot-in" type="text" maxlength="200" placeholder="Type your question" aria-label="Type your question" autocomplete="off"><button class="kbot-send" type="submit">Send</button></form>' +
     '<div class="kbot-note">Automatic answers from this website. What you type stays in your browser.</div>';
   document.body.appendChild(btn); document.body.appendChild(box);
-  var log = box.querySelector('.kbot-log'), chips = box.querySelector('.kbot-chips'), form = box.querySelector('form'), input = box.querySelector('input');
+  var log = box.querySelector('.kbot-log'), chips = box.querySelector('.kbot-chips'), more = box.querySelector('.kbot-more'), form = box.querySelector('form'), input = box.querySelector('input');
 
   function place() {
     var wf = document.querySelector('.wa-float'), b = wf ? 88 : 18;
@@ -158,7 +159,15 @@
       chips.appendChild(c);
     });
   }
+  /* The question buttons hide once a question is asked, so the answer has room; the Questions bar brings them back. */
+  function setChips(openIt) {
+    chips.classList.toggle('off', !openIt);
+    more.setAttribute('aria-expanded', openIt ? 'true' : 'false');
+    more.innerHTML = openIt ? 'Questions &#9662;' : 'Questions &#9656;';
+  }
+  more.addEventListener('click', function () { setChips(chips.classList.contains('off')); });
   function ask(q, topic) {
+    setChips(false);
     add(q, 'me');
     var r = topic || answer(q);
     add(r.a, 'bot', r.acts);
