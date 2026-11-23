@@ -132,6 +132,24 @@ th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vert
   render();
 })();
 </script>
+<script>
+(function () {
+  /* Counts a tap on Call or WhatsApp in a listing (which vendor, and which of the two; nothing about the visitor), only for a visitor
+     who already tapped Yes on the visit counting notice on the home page. No answer, or No: nothing is loaded and nothing is counted. */
+  var ID = 'G-6LQS69W4H0', saved = null;
+  try { saved = localStorage.getItem('kuttuVisitCount'); } catch (e) {}
+  if (saved !== 'yes') return;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { window.dataLayer.push(arguments); };
+  window.gtag('js', new Date()); window.gtag('config', ID, { anonymize_ip: true });
+  var s = document.createElement('script'); s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + ID; document.head.appendChild(s);
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('#list .vend .acts a'); if (!a) return;
+    window.gtag('event', 'vendor_enquiry', { vendor_name: a.closest('.vend').querySelector('h3').textContent, channel: /^tel:/.test(a.getAttribute('href')) ? 'call' : 'whatsapp' });
+  });
+})();
+</script>
 <footer><div class="wrap">Kuttu, Hyderabad. WhatsApp / Phone: <a href="tel:+917207629246">+91 72076 29246</a> &middot; <a href="/#terms">Terms and Conditions</a> &middot; <a href="/#privacy">Privacy Note</a><br>&copy; 2026 Kuttu. All rights reserved.</div></footer>
+<script src="chatbot.js"></script>
 </body>
 </html>
